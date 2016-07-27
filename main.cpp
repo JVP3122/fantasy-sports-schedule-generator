@@ -4,13 +4,25 @@
 int main(){
 	Player Jeff;
 
-	std::vector<int> temp;
+	std::cout << Jeff.Matchups().size() << std::endl;
 
-	temp.resize(Jeff.Matchups().size());
+	std::vector<int> games;
 
-	temp = Jeff.Matchups();
+	for (int i = 0;i < Jeff.Matchups().size();++i){
+		games.push_back(i + 1);
+	}
 
-	for (std::vector<int>::const_iterator iter = temp.begin(); iter != temp.end(); iter++){
+	int games_counter = 0;
+	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
+		std::cout << "Jeff.Matchups() = " << *iter << ", Games = " << games[games_counter] << std::endl;
+		games_counter++;
+	}
+
+	std::cout << std::endl;
+
+	Jeff.Matchups(games);
+
+	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
 		std::cout << *iter << std::endl;
 	}
 
