@@ -22,8 +22,17 @@ int main(){
 
 	Jeff.Matchups(games);
 
-	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
+	std::vector<int> temp;
+	temp = Jeff.Matchups();
+
+	std::cout << Jeff << std::endl;
+
+	for (std::vector<int>::const_iterator iter = temp.begin(); iter != temp.end(); iter++){
 		std::cout << *iter << std::endl;
+	}
+
+	for (int i = 0; i < Jeff.Matchups().size(); ++i){
+		std::cout << Jeff.Matchups()[i] << std::endl;
 	}
 
 	return 0;

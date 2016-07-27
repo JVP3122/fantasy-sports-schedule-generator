@@ -1,6 +1,10 @@
 // This file contains function prototypes for the Player class
 
+#ifndef PLAYER_HPP
+#define PLAYER_HPP
+
 #include<vector>
+#include<string>
 
 class Player{
 	private:
@@ -17,4 +21,12 @@ class Player{
 		std::vector<int> Matchups() const;	// Getter function
 
 		void Matchups(const std::vector<int>& input);	// Setter function
+
+		std::string ToString() const;	// Function to print out the information as a string
+
+		friend std::ostream& operator << (std::ostream& os, const Player& input);	// Send to ostream
+
+
 };
+
+#endif // !PLAYER_HPP
