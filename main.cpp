@@ -1,8 +1,10 @@
 #include <iostream>
 #include "Player.hpp"
+#include "League.hpp"
 
 int main(){
 	Player Jeff;
+	League Test_League;
 
 	std::cout << Jeff.Matchups().size() << std::endl;
 
@@ -22,12 +24,12 @@ int main(){
 
 	Jeff.Matchups(games);
 
-	std::vector<int> temp;
-	temp = Jeff.Matchups();
+	std::vector<int> MatchupVec;
+	MatchupVec = Jeff.Matchups();
 
 	std::cout << Jeff << std::endl;
 
-	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
+	for (std::vector<int>::const_iterator iter = MatchupVec.begin(); iter != MatchupVec.end(); iter++){
 		std::cout << *iter << std::endl;
 	}
 
