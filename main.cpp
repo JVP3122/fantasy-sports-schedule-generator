@@ -27,7 +27,7 @@ int main(){
 
 	std::cout << Jeff << std::endl;
 
-	for (std::vector<int>::const_iterator iter = temp.begin(); iter != temp.end(); iter++){
+	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
 		std::cout << *iter << std::endl;
 	}
 
