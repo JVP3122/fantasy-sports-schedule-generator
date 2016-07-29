@@ -10,7 +10,7 @@ int main(){
 
 	// Create a map of team names
 	std::map<int,std::string> Team_List;
-	Team_List[0] = "JeffP";
+	Team_List[0] = "Jeff P";
 	Team_List[1] = "Nico";
 	Team_List[2] = "Andrew";
 	Team_List[3] = "Doug";
@@ -20,7 +20,7 @@ int main(){
 	Team_List[7] = "Rob";
 	Team_List[8] = "Chris";
 	Team_List[9] = "Alan";
-	Team_List[10] = "JeffW";
+	Team_List[10] = "Jeff W";
 	Team_List[11] = "James";
 	Team_List[12] = "Ajay";
 	Team_List[13] = "Jack";
@@ -71,15 +71,26 @@ int main(){
 	// Print test output
 	std::cout << MonkeysWithCrayons << std::endl << std::endl;
 
+	MonkeysWithCrayons.Week(MonkeysWithCrayons.GenerateSchedule(),0);
+	std::vector<std::pair<int, int> > Week_One_Matchups = MonkeysWithCrayons.Week(0);
+
+//	Week_One_Matchups = MonkeysWithCrayons.Week(0);
+
+	std::cout << "Week 1 Matchups" << std::endl;
+
+	for (std::vector<std::pair<int, int> >::const_iterator iter = Week_One_Matchups.begin(); iter != Week_One_Matchups.end(); ++iter){
+		std::cout << Team_List[iter->first] << " vs " << Team_List[iter->second] << std::endl;
+	}
+
 	// Checking to see that an arbitrary matchup_limit vector was appropriately set
 	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Limit();
 
-	for (std::vector<int>::const_iterator iter = Temp_Limit_Vec.begin(); iter != Temp_Limit_Vec.end(); ++iter){
-		std::cout << *iter << " " ;
-	}
-	std::cout << std::endl;
+//	for (std::vector<int>::const_iterator iter = Temp_Limit_Vec.begin(); iter != Temp_Limit_Vec.end(); ++iter){
+//		std::cout << *iter << " " ;
+//	}
+//	std::cout << std::endl;
 
-	std::cout << PlayerVector[6] << std::endl;
+//	std::cout << PlayerVector[6] << std::endl;
 
 /*
 
@@ -155,6 +166,5 @@ int main(){
 	for (std::map<int, std::string>::const_iterator iter = temp_map.begin(); iter != temp_map.end(); ++iter)
 		std::cout << iter->second << std::endl;
 */
-
 	return 0;
 }

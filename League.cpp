@@ -6,6 +6,10 @@
 #include "League.hpp"
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <utility>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 
 // Default constructor - Not to be used
 League::League() : divisions(2), num_teams(14), num_weeks(13) {
@@ -55,6 +59,14 @@ std::map<int, std::string> League::TeamNames() const{	//Get the team names
 	return names;
 }
 
+std::vector<std::pair <int, int> > League::Week(const int& week_number) const{
+	std::vector<std::pair<int, int> > week_list;
+	for (int i = 0; i < num_teams; ++i){
+		week_list.push_back(std::make_pair(i,teams[i].Matchups()[week_number]));
+	}
+	return week_list;
+}
+
 // Setter functions
 void League::Divisions(const int& divs){	// Set the number of divisions
 	divisions = divs;
@@ -79,6 +91,51 @@ void League::Teams(const std::vector<Player>& team_list){	// Set the list of tea
 
 void League::TeamNames(const std::map<int, std::string>& names_list){	// Set the names of the teams
 	names = names_list;
+}
+
+void League::Week(const std::vector<std::pair<int, int> >& matchup_list, const int& week_number){
+	for (std::vector<std::pair<int, int> >::const_iterator iter = matchup_list.begin(); iter != matchup_list.end(); ++iter){
+		int team_num = iter->first;
+		int matchup_num = iter->second;
+		std::vector<int> temp_matchups = teams[team_num].Matchups();
+		temp_matchups[week_number] = matchup_num;
+		teams[team_num].Matchups(temp_matchups);
+	}
+}
+
+// Function to generate the schedule
+std::vector<std::pair <int, int> > League::GenerateSchedule(){
+	boost::random::mt11213b rng;
+	boost::random::uniform_int_distribution<> fourteen(0,13);
+	std::vector<int> RandNums;
+	for (int i = 0; i < 40; ++i){
+		RandNums.push_back(fourteen(rng));
+		std::cout << RandNums[i] << std::endl;
+	}
+
+	std::vector<std::pair<int, int> > games(num_teams);
+	std::vector<bool> game_scheduled;
+	for (int i = 0; i < num_teams; ++i)
+		game_scheduled.push_back(false);
+
+	for (int i = 0; i < num_teams; ++i){
+		if (game_scheduled[i] == false){
+			for (std::vector<int>::const_iterator iter = RandNums.begin(); iter != RandNums.end(); ++iter){
+				if (game_scheduled[*iter] == false && i != *iter){
+					games[i] = std::make_pair(i,*iter);
+					games[*iter] = std::make_pair(*iter,i);
+					game_scheduled[i] = true;
+					game_scheduled[*iter] = true;
+					std::cout << "game_scheduled: ";
+					for (std::vector<bool>::const_iterator it = game_scheduled.begin(); it != game_scheduled.end(); ++it)
+						std::cout << *it << " ";
+					std::cout << std::endl;
+					break;
+				}
+			}
+		}
+	}
+	return games;
 }
 
 // Function to print out the information as a string

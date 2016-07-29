@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <utility>
 #include "Player.hpp"
 
 class League{
@@ -29,6 +30,7 @@ public:
 	int Num_Weeks() const;	// Get the number of weeks
 	std::vector<Player> Teams() const;	// Get the list of teams
 	std::map<int, std::string> TeamNames() const;	// Get the names of the teams
+	std::vector<std::pair <int, int> > Week(const int& Week_Number) const;	// Get a vector of matchups for a given week
 
 	// Setter functions
 	void Divisions(const int& divs);	// Set the number of divisions
@@ -36,6 +38,10 @@ public:
 	void Num_Weeks(const int& n_weeks);	// Set the number of weeks
 	void Teams(const std::vector<Player>& team_list);	// Set the list of teams
 	void TeamNames(const std::map<int, std::string>& name_list);	// Set the names of the teams
+	void Week(const std::vector<std::pair <int, int> >& matchup_list, const int& week_number);	// Set the week's matchups
+
+	// Function to generate the schedule
+	std::vector<std::pair <int, int> > GenerateSchedule();
 
 	std::string ToString() const;	// Function to print out the information as a string
 
