@@ -4,18 +4,27 @@
 #include <iostream>
 #include <sstream>
 
-// Default constructor
-Player::Player() : num_weeks(13), num_teams(14), division(1), place(0) {
+// Default constructor - Not to be used
+Player::Player() : num_weeks(13), num_teams(14), division(1), place(0), name("Generic Team Name") {
 	matchups.resize(num_weeks);
 	matchup_limit.resize(num_teams);
 	matchup_count.resize(num_teams);
+	for(int i = 0; i < 14; ++i){
+		if (i < 7)
+			matchup_limit[i] = 2;
+		else
+			matchup_limit[i] = 1;
+	}
+	matchup_limit[0] = 0;
 }
 
 // Constructor with input
-Player::Player(const std::vector<int>& week_count, const std::vector<int>& limit, const std::vector<int>& count, const int weeks, const int teams, const int div, const int rank) : matchups(week_count), matchup_limit(limit), matchup_count(count), num_weeks(weeks), num_teams(teams), division(div), place(rank) { }
+Player::Player(const std::vector<int>& limit, const std::vector<int>& count, const int weeks, const int teams, const int div, const int rank, const std::string team_name) : matchup_limit(limit), matchup_count(count), num_weeks(weeks), num_teams(teams), division(div), place(rank), name(team_name) {
+	matchups.resize(weeks);
+}
 
 // Copy constructor
-Player::Player(const Player& input): matchups(input.matchups), matchup_limit(input.matchup_limit), matchup_count(input.matchup_count), num_weeks(input.num_weeks), num_teams(input.num_teams), division(input.division), place(input.place) { }
+Player::Player(const Player& input): matchups(input.matchups), matchup_limit(input.matchup_limit), matchup_count(input.matchup_count), num_weeks(input.num_weeks), num_teams(input.num_teams), division(input.division), place(input.place), name(input.name) { }
 
 // Destructor
 Player::~Player(){ }
@@ -32,6 +41,7 @@ Player& Player::operator = (const Player& input){
 	num_teams = input.num_teams;
 	division = input.division;
 	place = input.place;
+	name = input.name;
 	return *this;
 }
 
@@ -62,6 +72,10 @@ int Player::Num_Weeks() const{
 
 int Player::Num_Teams() const{
 	return num_teams;
+}
+
+std::string Player::Name() const{
+	return name;
 }
 
 // Setter functions
@@ -97,10 +111,14 @@ void Player::Place(const int& rank){
 	place = rank;
 }
 
+void Player::Name(const std::string& team_name){
+	name = team_name;
+}
+
 // Function to print out the information as a string
 std::string Player::ToString() const{
 	std::stringstream ss;
-	ss << "Team: " << place << ", Division: " << division << ".  Matchups: " << std::endl;
+	ss << "Team: " << name << ", Division: " << division << ".  Matchups: " << std::endl;
 	for (int i = 0;i < num_weeks; ++i){
 		ss << "Week " << i + 1 << ", " << matchups[i] << std::endl;
 	}
