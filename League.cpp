@@ -104,38 +104,73 @@ void League::Week(const std::vector<std::pair<int, int> >& matchup_list, const i
 }
 
 // Function to generate the schedule
-std::vector<std::pair <int, int> > League::GenerateSchedule(){
-	boost::random::mt11213b rng;
-	boost::random::uniform_int_distribution<> fourteen(0,13);
-	std::vector<int> RandNums;
-	for (int i = 0; i < 40; ++i){
-		RandNums.push_back(fourteen(rng));
-		std::cout << RandNums[i] << std::endl;
-	}
+std::vector<std::vector<std::pair <int, int> > > League::GenerateSchedule(){
+	std::vector<std::vector<std::pair <int, int> > > Schedule;
+		// Create a random integer generator of numbers from 0 to the number of teams - 1
+		boost::random::mt11213b rng;
+		boost::random::uniform_int_distribution<> fourteen(0,num_teams - 1);
+		
+		// Create the vector of 40 random integers.  40 is an arbitrary number
+		std::vector<int> RandNums;
+		for (int i = 0; i < 40; ++i){
+			RandNums.push_back(fourteen(rng));
+//			std::cout << RandNums[i] << std::endl;
+		}
 
-	std::vector<std::pair<int, int> > games(num_teams);
-	std::vector<bool> game_scheduled;
-	for (int i = 0; i < num_teams; ++i)
-		game_scheduled.push_back(false);
+		// Instantiate Count and Limit matrices from the individual player counts and limits for tracking
+		std::vector<std::vector<int> > Count_Matrix;
+		std::vector<std::vector<int> > Limit_Matrix;
 
-	for (int i = 0; i < num_teams; ++i){
-		if (game_scheduled[i] == false){
-			for (std::vector<int>::const_iterator iter = RandNums.begin(); iter != RandNums.end(); ++iter){
-				if (game_scheduled[*iter] == false && i != *iter){
-					games[i] = std::make_pair(i,*iter);
-					games[*iter] = std::make_pair(*iter,i);
-					game_scheduled[i] = true;
-					game_scheduled[*iter] = true;
-					std::cout << "game_scheduled: ";
-					for (std::vector<bool>::const_iterator it = game_scheduled.begin(); it != game_scheduled.end(); ++it)
-						std::cout << *it << " ";
-					std::cout << std::endl;
-					break;
+		// Populate the Count and Limit Matrices
+		for (int team_iter = 0; team_iter < num_teams; ++team_iter)
+			Count_Matrix.push_back(teams[team_iter].Matchup_Count());
+
+		for (int team_iter = 0; team_iter < num_teams; ++team_iter)
+			Limit_Matrix.push_back(teams[team_iter].Matchup_Limit());
+
+		// Test print output
+		for (int i = 0; i < Limit_Matrix.size(); ++i){
+			for (int j = 0; j < Limit_Matrix[i].size(); ++j){
+				std::cout << Limit_Matrix[i][j] << " ";
+			}
+			std::cout << std::endl;
+		}
+
+		/***********************Main Loop************************/
+		for (int week_val = 0; week_val < num_weeks; ++week_val){
+		// Create the output vector that has pair elements
+		std::vector<std::pair<int, int> > games(num_teams);
+
+		// Create a boolean vector to track if a team already has a matchup this week and initialize all elements to false
+		std::vector<bool> game_scheduled;
+		for (int i = 0; i < num_teams; ++i)
+			game_scheduled.push_back(false);
+
+		// Main loop
+		for (int i = 0; i < num_teams; ++i){
+			// If the ith player does not already have a matchup scheduled
+			if (game_scheduled[i] == false){
+				// Run through the random number vector to find an opponent for the ith player
+				for (std::vector<int>::const_iterator iter = RandNums.begin(); iter != RandNums.end(); ++iter){
+					// If the opponent doesn't already have a game and the ith member is not the same as the "opponent" and check to see if the current count is under the limit
+					if (game_scheduled[*iter] == false && i != *iter && Count_Matrix[i][*iter] <= Limit_Matrix[i][*iter]){
+						games[i] = std::make_pair(i,*iter);	// Create the pair for the ith member
+						games[*iter] = std::make_pair(*iter,i);	// Create a corresponding pair for the opponent
+						game_scheduled[i] = true;	// Set the game_scheduled value for the ith member equal to true
+						game_scheduled[*iter] = true;	// Set the game_scheduled value for the "opponent" equal to true
+						Count_Matrix[i][*iter]++;	// Increase the count by one
+	/*					std::cout << "game_scheduled: ";
+						for (std::vector<bool>::const_iterator it = game_scheduled.begin(); it != game_scheduled.end(); ++it)
+							std::cout << *it << " ";
+						std::cout << std::endl;
+	*/					break;
+					}
 				}
 			}
 		}
+		Schedule.push_back(games);
 	}
-	return games;
+	return Schedule;
 }
 
 // Function to print out the information as a string

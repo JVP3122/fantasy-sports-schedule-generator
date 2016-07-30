@@ -65,32 +65,45 @@ int main(){
 		PlayerVector.push_back(Player(Matchup_Limits,Matchup_Count,weeks,teams,divs,i,Team_List[i]));
 	}
 
+	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Count();
+//	for (std::vector<int>::const_iterator it = Temp_Limit_Vec.begin(); it != Temp_Limit_Vec.end(); ++it)
+//		std::cout << *it << " ";
+//	std::cout << std::endl;
+
 	// Instantiate the League with the necessary inputs
 	League MonkeysWithCrayons(divs,teams,weeks,PlayerVector,Team_List);
 
 	// Print test output
 	std::cout << MonkeysWithCrayons << std::endl << std::endl;
 
-	MonkeysWithCrayons.Week(MonkeysWithCrayons.GenerateSchedule(),0);
-	std::vector<std::pair<int, int> > Week_One_Matchups = MonkeysWithCrayons.Week(0);
+	// Set the first week to the preliminarily generated schedule
+//	MonkeysWithCrayons.Week(MonkeysWithCrayons.GenerateSchedule(),0);
 
-//	Week_One_Matchups = MonkeysWithCrayons.Week(0);
+	// Check functionality of the Week Getter function
+	std::vector<std::vector<std::pair<int, int> > > Schedule = MonkeysWithCrayons.GenerateSchedule();
 
-	std::cout << "Week 1 Matchups" << std::endl;
-
-	for (std::vector<std::pair<int, int> >::const_iterator iter = Week_One_Matchups.begin(); iter != Week_One_Matchups.end(); ++iter){
-		std::cout << Team_List[iter->first] << " vs " << Team_List[iter->second] << std::endl;
+	int week_val = 1;
+	for (std::vector<std::vector<std::pair<int, int> > >::const_iterator row = Schedule.begin(); row != Schedule.end(); ++row){
+		std::cout << "Week " << week_val << std::endl;
+		for (std::vector<std::pair<int, int> >::const_iterator col = row->begin(); col != row->end(); ++col){
+			std::cout << Team_List[col->first] << " vs " << Team_List[col->second] << std::endl;
+		}
+		std::cout << std::endl;
+		++week_val;
 	}
 
-	// Checking to see that an arbitrary matchup_limit vector was appropriately set
-	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Limit();
-
-//	for (std::vector<int>::const_iterator iter = Temp_Limit_Vec.begin(); iter != Temp_Limit_Vec.end(); ++iter){
-//		std::cout << *iter << " " ;
+	// Test printout of the generated schedule
+//	std::cout << "Week 1 Matchups" << std::endl;
+//
+//	for (std::vector<std::pair<int, int> >::const_iterator iter = Week_One_Matchups.begin(); iter != Week_One_Matchups.end(); ++iter){
+//		std::cout << Team_List[iter->first] << " vs " << Team_List[iter->second] << std::endl;
 //	}
-//	std::cout << std::endl;
 
-//	std::cout << PlayerVector[6] << std::endl;
+	// Checking to see that an arbitrary matchup_limit vector was appropriately set
+//	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Limit();
+//	for (std::vector<int>::const_iterator it = Temp_Limit_Vec.begin(); it != Temp_Limit_Vec.end(); ++it)
+//		std::cout << *it << " ";
+//	std::cout << std::endl;
 
 /*
 

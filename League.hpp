@@ -41,7 +41,7 @@ public:
 	void Week(const std::vector<std::pair <int, int> >& matchup_list, const int& week_number);	// Set the week's matchups
 
 	// Function to generate the schedule
-	std::vector<std::pair <int, int> > GenerateSchedule();
+	std::vector<std::vector<std::pair <int, int> > > GenerateSchedule();
 
 	std::string ToString() const;	// Function to print out the information as a string
 
