@@ -8,8 +8,8 @@
 #include <sstream>
 #include <vector>
 #include <utility>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
+#include "boost/random.hpp"
+#include "boost/generator_iterator.hpp"
 
 // Default constructor - Not to be used
 League::League() : divisions(2), num_teams(14), num_weeks(13) {
@@ -17,10 +17,10 @@ League::League() : divisions(2), num_teams(14), num_weeks(13) {
 }
 
 // Constructor with input
-League::League(const int& divs, const int& n_teams, const int& n_weeks, const std::vector<Player>& team_list, const std::map<int, std::string>& names_list) : divisions(divs), num_teams(n_teams), num_weeks(n_weeks), teams(team_list), names(names_list) { }
+League::League(const int& divs, const int& n_teams, const int& n_weeks, const int& id, const int& idl, const std::vector<Player>& team_list, const std::map<int, std::string>& names_list) : divisions(divs), num_teams(n_teams), num_weeks(n_weeks), intra_divisional(id), intra_div_limit(idl), teams(team_list), names(names_list) { }
 
 // Copy constructor
-League::League(const League& input) : divisions(input.divisions), num_teams(input.num_teams), num_weeks(input.num_weeks), teams(input.teams), names(input.names) {}
+League::League(const League& input) : divisions(input.divisions), num_teams(input.num_teams), num_weeks(input.num_weeks), intra_divisional(input.intra_divisional), intra_div_limit(input.intra_div_limit), teams(input.teams), names(input.names) {}
 
 // Destructor
 League::~League(){}
@@ -33,6 +33,8 @@ League& League::operator = (const League& input){
 	divisions = input.divisions;
 	num_teams = input.num_teams;
 	num_weeks = input.num_weeks;
+	intra_divisional = input.intra_divisional;
+	intra_div_limit = input.intra_div_limit;
 	teams = input.teams;
 	names = input.names;
 	return *this;
@@ -107,37 +109,31 @@ void League::Week(const std::vector<std::pair<int, int> >& matchup_list, const i
 std::vector<std::vector<std::pair <int, int> > > League::GenerateSchedule(){
 	std::vector<std::vector<std::pair <int, int> > > Schedule;
 		// Create a random integer generator of numbers from 0 to the number of teams - 1
-		boost::random::mt11213b rng;
-		boost::random::uniform_int_distribution<> fourteen(0,num_teams - 1);
-		
+	boost::mt11213b rng(time(0));
+	boost::uniform_int<> fourteen(0,num_teams - 1);
+	boost::variate_generator<boost::mt11213b, boost::uniform_int<> > rand_val(rng,fourteen);
+
 		// Create the vector of 40 random integers.  40 is an arbitrary number
-		std::vector<int> RandNums;
-		for (int i = 0; i < 40; ++i){
-			RandNums.push_back(fourteen(rng));
+	std::vector<int> RandNums;
+	for (int i = 0; i < 40; ++i){
+		RandNums.push_back(rand_val());
 //			std::cout << RandNums[i] << std::endl;
-		}
+	}
 
 		// Instantiate Count and Limit matrices from the individual player counts and limits for tracking
-		std::vector<std::vector<int> > Count_Matrix;
-		std::vector<std::vector<int> > Limit_Matrix;
+	std::vector<std::vector<int> > Count_Matrix;
+	std::vector<std::vector<int> > Limit_Matrix;
+//		std::vector<int> ID_Vec;
+//		std::vector<int> IDL_Vec;
 
 		// Populate the Count and Limit Matrices
-		for (int team_iter = 0; team_iter < num_teams; ++team_iter)
-			Count_Matrix.push_back(teams[team_iter].Matchup_Count());
+	for (int team_iter = 0; team_iter < num_teams; ++team_iter){
+		Count_Matrix.push_back(teams[team_iter].Matchup_Count());
+		Limit_Matrix.push_back(teams[team_iter].Matchup_Limit());
+	}
 
-		for (int team_iter = 0; team_iter < num_teams; ++team_iter)
-			Limit_Matrix.push_back(teams[team_iter].Matchup_Limit());
-
-		// Test print output
-		for (int i = 0; i < Limit_Matrix.size(); ++i){
-			for (int j = 0; j < Limit_Matrix[i].size(); ++j){
-				std::cout << Limit_Matrix[i][j] << " ";
-			}
-			std::cout << std::endl;
-		}
-
-		/***********************Main Loop************************/
-		for (int week_val = 0; week_val < num_weeks; ++week_val){
+	/***********************Main Loop************************/
+	for (int week_val = 0; week_val < num_weeks; ++week_val){
 		// Create the output vector that has pair elements
 		std::vector<std::pair<int, int> > games(num_teams);
 
@@ -153,17 +149,14 @@ std::vector<std::vector<std::pair <int, int> > > League::GenerateSchedule(){
 				// Run through the random number vector to find an opponent for the ith player
 				for (std::vector<int>::const_iterator iter = RandNums.begin(); iter != RandNums.end(); ++iter){
 					// If the opponent doesn't already have a game and the ith member is not the same as the "opponent" and check to see if the current count is under the limit
-					if (game_scheduled[*iter] == false && i != *iter && Count_Matrix[i][*iter] <= Limit_Matrix[i][*iter]){
+					if (game_scheduled[*iter] == false && i != *iter && Count_Matrix[i][*iter] < Limit_Matrix[i][*iter]){// && ((teams[i].Division() != teams[*iter].Division() && ID_Vec[i] < IDL_Vec[i]) || (teams[i].Division() == teams[*iter].Division()))){
 						games[i] = std::make_pair(i,*iter);	// Create the pair for the ith member
 						games[*iter] = std::make_pair(*iter,i);	// Create a corresponding pair for the opponent
 						game_scheduled[i] = true;	// Set the game_scheduled value for the ith member equal to true
 						game_scheduled[*iter] = true;	// Set the game_scheduled value for the "opponent" equal to true
 						Count_Matrix[i][*iter]++;	// Increase the count by one
-	/*					std::cout << "game_scheduled: ";
-						for (std::vector<bool>::const_iterator it = game_scheduled.begin(); it != game_scheduled.end(); ++it)
-							std::cout << *it << " ";
-						std::cout << std::endl;
-	*/					break;
+						Count_Matrix[*iter][i]++;	// Increase the opponent's count by one
+						break;
 					}
 				}
 			}

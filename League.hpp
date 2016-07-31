@@ -8,9 +8,11 @@
 
 class League{
 private:
-	int divisions;
-	int num_teams;
-	int num_weeks;
+	int divisions;	// Number of divisions
+	int num_teams;	// Number of teams
+	int num_weeks;	// Number of weeks
+	int intra_divisional;	// Number of times a team is playing a team from an opposing division - Not currently used
+	int intra_div_limit;	// Max number of times a team can play a team from an opposing division - Not currently used
 
 	std::map<int, std::string> names;
 
@@ -18,7 +20,7 @@ private:
 
 public:
 	League();	// Default constructor - Not to be used
-	League(const int& divs, const int& n_teams, const int& n_weeks, const std::vector<Player>& team_list, const std::map<int, std::string>& names_list);	// Constructor with inputs
+	League(const int& divs, const int& n_teams, const int& n_weeks, const int& id, const int& idl, const std::vector<Player>& team_list, const std::map<int, std::string>& names_list);	// Constructor with inputs
 	League(const League& input);	// Copy constructor
 	~League();	// Destructor
 

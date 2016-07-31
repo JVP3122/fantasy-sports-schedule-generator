@@ -5,7 +5,7 @@
 #include <sstream>
 
 // Default constructor - Not to be used
-Player::Player() : num_weeks(13), num_teams(14), division(1), place(0), name("Generic Team Name") {
+Player::Player() : num_weeks(13), num_teams(14), division(1), place(0), intra_divisional(0), intra_div_limit(2), name("Generic Team Name") {
 	matchups.resize(num_weeks);
 	matchup_limit.resize(num_teams);
 	matchup_count.resize(num_teams);
@@ -19,12 +19,12 @@ Player::Player() : num_weeks(13), num_teams(14), division(1), place(0), name("Ge
 }
 
 // Constructor with input
-Player::Player(const std::vector<int>& limit, const std::vector<int>& count, const int weeks, const int teams, const int div, const int rank, const std::string team_name) : matchup_limit(limit), matchup_count(count), num_weeks(weeks), num_teams(teams), division(div), place(rank), name(team_name) {
+Player::Player(const std::vector<int>& limit, const std::vector<int>& count, const int weeks, const int teams, const int div, const int rank, const int id, const int idl, const std::string team_name) : matchup_limit(limit), matchup_count(count), num_weeks(weeks), num_teams(teams), division(div), place(rank), intra_divisional(id), intra_div_limit(idl), name(team_name) {
 	matchups.resize(weeks);
 }
 
 // Copy constructor
-Player::Player(const Player& input): matchups(input.matchups), matchup_limit(input.matchup_limit), matchup_count(input.matchup_count), num_weeks(input.num_weeks), num_teams(input.num_teams), division(input.division), place(input.place), name(input.name) { }
+Player::Player(const Player& input): matchups(input.matchups), matchup_limit(input.matchup_limit), matchup_count(input.matchup_count), num_weeks(input.num_weeks), num_teams(input.num_teams), division(input.division), place(input.place), intra_divisional(input.intra_divisional), intra_div_limit(input.intra_div_limit), name(input.name) { }
 
 // Destructor
 Player::~Player(){ }
@@ -42,6 +42,8 @@ Player& Player::operator = (const Player& input){
 	division = input.division;
 	place = input.place;
 	name = input.name;
+	intra_divisional = input.intra_divisional;
+	intra_div_limit = input.intra_div_limit;
 	return *this;
 }
 
@@ -72,6 +74,14 @@ int Player::Num_Weeks() const{
 
 int Player::Num_Teams() const{
 	return num_teams;
+}
+
+int Player::Intra_Div() const{
+	return intra_divisional;
+}
+
+int Player::Intra_Div_Limit() const{
+	return intra_div_limit;
 }
 
 std::string Player::Name() const{
@@ -109,6 +119,14 @@ void Player::Division(const int& input){
 
 void Player::Place(const int& rank){
 	place = rank;
+}
+
+void Player::Intra_Div(const int& id){
+	intra_divisional = id;
+}
+
+void Player::Intra_Div_Limit(const int& idl){
+	intra_div_limit = idl;
 }
 
 void Player::Name(const std::string& team_name){

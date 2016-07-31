@@ -1,6 +1,11 @@
+// The main file that creates the league and generates the schedule, also outputting the schedule to a csv file
+
 #include <iostream>
 #include "Player.hpp"
 #include "League.hpp"
+#include <fstream>
+#include <unistd.h>
+#include <algorithm>
 
 int main(){
 
@@ -62,122 +67,53 @@ int main(){
 		Matchup_Limits[i] = 0;
 
 		// Instantiate a Player object with the corresponding attributes
-		PlayerVector.push_back(Player(Matchup_Limits,Matchup_Count,weeks,teams,divs,i,Team_List[i]));
+		PlayerVector.push_back(Player(Matchup_Limits,Matchup_Count,weeks,teams,divs,i,0,2,Team_List[i]));
 	}
 
-	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Count();
-//	for (std::vector<int>::const_iterator it = Temp_Limit_Vec.begin(); it != Temp_Limit_Vec.end(); ++it)
-//		std::cout << *it << " ";
-//	std::cout << std::endl;
-
 	// Instantiate the League with the necessary inputs
-	League MonkeysWithCrayons(divs,teams,weeks,PlayerVector,Team_List);
+	League MonkeysWithCrayons(divs,teams,weeks,0,2,PlayerVector,Team_List);
 
 	// Print test output
 	std::cout << MonkeysWithCrayons << std::endl << std::endl;
 
-	// Set the first week to the preliminarily generated schedule
-//	MonkeysWithCrayons.Week(MonkeysWithCrayons.GenerateSchedule(),0);
 
-	// Check functionality of the Week Getter function
-	std::vector<std::vector<std::pair<int, int> > > Schedule = MonkeysWithCrayons.GenerateSchedule();
+	// Loop to run through the schedule generation until there are no instances where a team has no matchup
+	int double_zeros = 1;	// A zero in the team location and opponent location in the pair
+	int count = 0;	// While loop count
+	int double_zero_min_val = 20;	// Variable for output at the end the minimum double_zero value
+	std::vector<std::vector<std::pair<int, int> > > Schedule;
+	while (double_zeros > 0 && count < 600){	// count < 600 solely to set the time taken at 5 minutes
+		double_zeros = 0;	// Reset double_zeros to 0
+		Schedule = MonkeysWithCrayons.GenerateSchedule();
 
+		for (std::vector<std::vector<std::pair<int, int> > >::const_iterator row = Schedule.begin(); row != Schedule.end(); ++row){
+			for (std::vector<std::pair<int, int> >::const_iterator col = row->begin(); col != row->end(); ++col){
+				if (col->first == 0 && col->second == 0)
+					double_zeros++;	// If an individual pair has both elements = 0 then increment the double_zeros variable
+			}
+		}
+		int sec = int(1*1000000);	// Pause for the random number generator
+    	usleep(sec);	// Pause for the random number generator
+		std::cout.flush();
+		count++;	// Increment the count variable
+		std::cout << "Count: " << count << ", double_zeros = " << double_zeros << std::endl;	// Display the count and current double_zeros value
+		double_zero_min_val = std::min(double_zeros,double_zero_min_val);	// Re-assign the min double_zeros value
+	}
+	std::cout << "Min double_zeros value: " << double_zero_min_val << std::endl; // Print the min double_zeros value at the end of the loop
+
+	// Write the schedule in numeric format to a csv file
+	std::ofstream myfile;
+	myfile.open("Basic Schedule.csv");
 	int week_val = 1;
 	for (std::vector<std::vector<std::pair<int, int> > >::const_iterator row = Schedule.begin(); row != Schedule.end(); ++row){
-		std::cout << "Week " << week_val << std::endl;
+		myfile << "Week " << week_val << std::endl;
 		for (std::vector<std::pair<int, int> >::const_iterator col = row->begin(); col != row->end(); ++col){
-			std::cout << Team_List[col->first] << " vs " << Team_List[col->second] << std::endl;
+			myfile << col->first << "," << col->second << ",,";
 		}
-		std::cout << std::endl;
+		myfile << std::endl;
 		++week_val;
 	}
+	myfile.close();
 
-	// Test printout of the generated schedule
-//	std::cout << "Week 1 Matchups" << std::endl;
-//
-//	for (std::vector<std::pair<int, int> >::const_iterator iter = Week_One_Matchups.begin(); iter != Week_One_Matchups.end(); ++iter){
-//		std::cout << Team_List[iter->first] << " vs " << Team_List[iter->second] << std::endl;
-//	}
-
-	// Checking to see that an arbitrary matchup_limit vector was appropriately set
-//	std::vector<int> Temp_Limit_Vec = PlayerVector[3].Matchup_Limit();
-//	for (std::vector<int>::const_iterator it = Temp_Limit_Vec.begin(); it != Temp_Limit_Vec.end(); ++it)
-//		std::cout << *it << " ";
-//	std::cout << std::endl;
-
-/*
-
-	std::vector<int> TeamNumberVector;
-
-	Player JeffP;
-	Player Nico;
-	Player Andrew;
-	Player Doug;
-	Player Dennis;
-	Player Austin;
-
-	for (std::map<int,std::string>::const_iterator iter = Team_List.begin(); iter != Team_List.end(); ++iter)
-		TeamNumberVector.push_back(iter->first);
-	
-	// Instantiate the League
-	League MonkeysWithCrayons;
-
-	MonkeysWithCrayons.TeamNames(Team_List);
-
-	std::cout << MonkeysWithCrayons << std::endl << std::endl;
-
-	League Test_League;
-
-	std::cout << Test_League << std::endl;
-
-/*	Player Jeff;
-
-	std::cout << Jeff.Matchups().size() << std::endl;
-
-	std::vector<int> games;
-
-	for (int i = 0;i < Jeff.Matchups().size();++i){
-		games.push_back(i + 1);
-	}
-
-	int games_counter = 0;
-	for (std::vector<int>::const_iterator iter = Jeff.Matchups().begin(); iter != Jeff.Matchups().end(); iter++){
-		std::cout << "Jeff.Matchups() = " << *iter << ", Games = " << games[games_counter] << std::endl;
-		games_counter++;
-	}
-
-	std::cout << std::endl;
-
-	Jeff.Matchups(games);
-
-	std::vector<int> MatchupVec;
-	MatchupVec = Jeff.Matchups();
-
-	std::cout << Jeff << std::endl;
-
-	for (std::vector<int>::const_iterator iter = MatchupVec.begin(); iter != MatchupVec.end(); iter++){
-		std::cout << *iter << std::endl;
-	}
-
-	for (int i = 0; i < Jeff.Matchups().size(); ++i){
-		std::cout << Jeff.Matchups()[i] << std::endl;
-	}
-
-	std::cout << Test_League << std::endl;
-	std::vector<Player> temp_vector = Test_League.Teams();
-	std::cout << temp_vector[2] << std::endl;
-
-	std::map<int, std::string> names;
-	names[0] = "Jeff";
-	names[1] = "Ajay";
-	names[2] = "James";
-	names[3] = "Jack";
-	Test_League.TeamNames(names);
-
-	std::map<int, std::string> temp_map = Test_League.TeamNames();
-	
-	for (std::map<int, std::string>::const_iterator iter = temp_map.begin(); iter != temp_map.end(); ++iter)
-		std::cout << iter->second << std::endl;
-*/
 	return 0;
 }
